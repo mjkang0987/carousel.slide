@@ -62,6 +62,12 @@ const mainJS = (_ => {
     const slides = carousel.querySelectorAll(slide);
     const slideLength = slides.length;
     const cloneLength = 2;
+    let slideWidth = Math.trunc(slideWrap.offsetWidth / view);
+    let currentIndex = 0;
+    let isTransition = true;
+    let transformX = loop ? -(slideWidth) : 0;
+    const speed = (500 / 1000);
+    let timer = null;
 
     const setInitialElement = _ => {
       slideEl.first = slides[0];
