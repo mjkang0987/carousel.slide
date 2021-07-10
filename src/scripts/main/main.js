@@ -137,7 +137,13 @@ const mainJS = (_ => {
 
     };
 
-    const onThisSlide = _ => {
+    const onPagination = _ => {
+      const currentDot = slideEl.pagination.querySelector(`button[data-index="${currentIndex}"]`);
+      const prevDot = slideEl.pagination.querySelector('.current');
+
+      prevDot.classList.remove('current');
+      currentDot.classList.add('current');
+    };
 
     const onMove = e => {
       const target = e.target;
@@ -221,7 +227,18 @@ const mainJS = (_ => {
       insertEl({
         target  : carousel,
         position: 'beforeend',
-        el      : paginationWrap
+        el      : slideEl.pagination
+      });
+
+      slideEl.pagination.addEventListener('click', e => {
+        const target = e.target;
+
+        if (target.tagName !== 'BUTTON') {
+          return;
+        }
+
+        const index = Number(target.getAttribute('data-index'));
+        setIndex({index});
       });
     };
 
