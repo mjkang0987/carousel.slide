@@ -66,6 +66,8 @@ const mainJS = (_ => {
     const setInitialElement = _ => {
       slideEl.first = slides[0];
       slideEl.last = slides[slideLength - 1];
+
+      slideEl.first.classList.add('current');
     };
 
     const setInitialClone = ({type}) => {
