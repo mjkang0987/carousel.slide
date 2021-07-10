@@ -90,7 +90,6 @@ const mainJS = (_ => {
     };
 
     const setInitialStyle = _ => {
-      const slideWidth = Math.trunc(slideWrap.offsetWidth / view);
       const wrapWidth = slideWidth * slideLength + cloneLength;
 
       carousel.setAttribute('style', 'position: relative');
