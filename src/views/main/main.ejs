@@ -1,0 +1,41 @@
+---
+name: Carousel Slide
+group: example
+state:
+  default: 에제
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title><%= page.name %></title>
+  <meta name="description" content="carousel slide plugin">
+  <meta name="keywords" content="slide, carousel slide, pure script slide, pure script carousel slide">
+  <meta property="og:image" content="" />
+  <meta property="og:site_name" content="carousel slide plugin"/>
+  <meta property="og:title" content="carousel slide" />
+  <meta property="og:description" content="carousel slide plugin"/>
+  <link
+    rel="stylesheet"
+    href="/styles/common/common.css">
+  <link
+    rel="stylesheet"
+    href="/styles/main/main.css">
+</head>
+<body>
+<% const text = '<strong>스매시 레전드</strong><span>예측 불가! 상상초월! 실시간 대전 액션, 스매시 레전드<br><br>당신의 3분을 뺏겠습니!<br>스매시 레전드에서 펼쳐지는 긴장감 터지는 3분 실시간 난투!<br>개성 넘치는 레전드와 함께 전 세계 플레이어를 날려버리세요!<br><br>SMASH는 계속되어야 한다!</span>';%>
+<div class="slideWrap">
+  <ul class="slides">
+    <% for (let i = 0; i < 13; i++) { %>
+    <li>
+      <img
+        src="/images/main/img-<%= i + 1 %>.png"
+        alt="">
+      <%- text %>
+    </li>
+    <% } %>
+  </ul>
+</div>
+<script src="/scripts/main/main.js"></script>
+</body>
+</html>
