@@ -121,6 +121,20 @@ const mainJS = (_ => {
       });
     };
 
+    const setElement = _ => {
+      const prevSlide = slideWrap.querySelector('li.current');
+      const currentSlide = slideWrap.querySelector(`li[data-index="${currentIndex}"]`);
+      const isFirst = currentIndex === 0;
+      const isLast = currentIndex === slideLength - 1;
+
+      prevSlide.classList.remove('current');
+      currentSlide.classList.add('current');
+
+      if (!loop) {
+        slideEl.btnPrev.disabled = isFirst;
+        slideEl.btnNext.disabled = isLast;
+      }
+    };
 
     const setIndex = ({index}) => {
       if (!isTransition) {
