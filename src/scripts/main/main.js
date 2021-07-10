@@ -101,7 +101,26 @@ const mainJS = (_ => {
       });
     };
 
-    const onPrevSlide = _ => {
+    const getTransition = _ => {
+      slideWrap.addEventListener('transitionend', e => {
+        const target = e.target;
+        if (target.className !== 'slides') {
+          return;
+        }
+
+        isTransition = true;
+      });
+
+      slideWrap.addEventListener('transitionstart', e => {
+        const target = e.target;
+        if (target.className !== 'slides') {
+          return;
+        }
+
+        isTransition = false;
+      });
+    };
+
     };
 
     const onNextSlide = _ => {
