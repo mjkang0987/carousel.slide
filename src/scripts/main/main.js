@@ -318,6 +318,8 @@ const mainJS = (_ => {
       if (pagination) {
         setPagination();
       }
+
+      getTransition();
     };
 
     setCarousel();
