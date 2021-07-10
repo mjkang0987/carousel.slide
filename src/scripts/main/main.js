@@ -65,7 +65,9 @@ const mainJS = (_ => {
     const setInitialElement = _ => {
       slideEl.first = slides[0];
       slideEl.last = slides[slideLength - 1];
+    };
 
+    const setInitialClone = _ => {
       slideEl.firstClone = slideEl.first.cloneNode(true);
       slideEl.lastClone = slideEl.last.cloneNode(true);
 
@@ -131,6 +133,10 @@ const mainJS = (_ => {
     const setCarousel = _ => {
       setInitialStyle();
       setInitialElement();
+
+      if (loop) {
+        setInitialClone();
+      }
 
       if (direction) {
         setDirection();
