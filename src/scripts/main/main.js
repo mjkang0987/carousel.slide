@@ -41,7 +41,8 @@ const mainJS = (_ => {
       space     : 0,
       loop      : false,
       direction : false,
-      pagination: false
+      pagination: false,
+      timing     : null
     };
 
     const slideEl = {
@@ -174,9 +175,23 @@ const mainJS = (_ => {
         position: 'beforeend',
         el      : paginationWrap
       });
-
-      paginationWrap.addEventListener('click', onThisSlide);
     };
+
+    const startInterval = _ => {
+      setIndex({index: currentIndex + 1});
+    };
+
+    const stopInterval = _ => {
+      clearInterval(timer);
+    };
+
+    timer = setInterval(startInterval, timing);
+
+    carousel.addEventListener('mouseenter', stopInterval);
+    carousel.addEventListener('mouseleave', _ => {
+      timer = setInterval(startInterval, timing);
+    });
+
 
     const setCarousel = _ => {
       setInitialStyle();
