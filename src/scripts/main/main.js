@@ -100,16 +100,21 @@ const mainJS = (_ => {
       slideEl.btnPrev = createEl({
         tag      : 'button',
         attribute: {
-          className: 'carouselButton btnPrev'
+          className: 'carouselButton btnPrev',
+          style    : 'position: absolute; left: 0; top: 50%; transform: translateY(-50%)'
         }
       });
 
       slideEl.btnNext = createEl({
         tag      : 'button',
         attribute: {
-          className: 'carouselButton btnNext'
+          className: 'carouselButton btnNext',
+          style    : 'position: absolute; right: 0; top: 50%; transform: translateY(-50%)'
         }
       });
+
+      slideEl.btnPrev.textContent = '<';
+      slideEl.btnNext.textContent = '>';
 
       insertEl({
         target: slideWrap,
@@ -121,6 +126,9 @@ const mainJS = (_ => {
         position: 'afterend',
         el      : slideEl.btnNext
       });
+
+      slideEl.btnPrev.addEventListener('click', onPrevSlide);
+      slideEl.btnNext.addEventListener('click', onNextSlide);
     };
 
     const setPagination = _ => {
@@ -143,9 +151,6 @@ const mainJS = (_ => {
 
       if (direction) {
         setDirection();
-
-        slideEl.btnPrev.addEventListener('click', onPrevSlide);
-        slideEl.btnNext.addEventListener('click', onNextSlide);
       }
 
       if (pagination) {
