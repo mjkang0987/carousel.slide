@@ -1,15 +1,4 @@
 const mainJS = (_ => {
-  const userRedirect = _ => {
-    return;
-    const MOBILE_PATH = 'https://m.insterior.biz';
-    const URL_ORIGIN = location.origin;
-    const PATH = location.href.replace(URL_ORIGIN, '');
-    const mobileURL = 'http://localhost:8080/views/biz/index.mobile.html';
-    if (/Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      window.location.href = `${MOBILE_PATH}${PATH}`;
-    }
-  };
-
   const docSelector = ({
     el,
     all: isAll
@@ -21,353 +10,338 @@ const mainJS = (_ => {
     }
   };
 
+  const insertEl = ({
+    target,
+    position: pos = 'beforebegin',
+    el
+  }) => {
+    target.insertAdjacentElement(pos, el);
+  };
+
   const createEl = ({tag, attribute}) => {
     const el = document.createElement(tag);
     Object.assign(el, attribute);
     return el;
   };
 
-  const ELEMENT = {
-    ACCOUNT_ID   : docSelector({el: '#crema-login-username'}),
-    ACCOUNT_NAME : docSelector({el: '#crema-login-name'}),
-    BTN_SLIDE_ALL: docSelector({el: '.btn-all-banner'})
-  };
-
-  const INFO = {
-    PRD_LINK    : '/shop/detail.php?pno=',
-    IMG_LOCATION: '//insbizmallcdn.wisacdn.com/_data/product/'
-  };
-
-  const ARR_BADGE = {
-    all     : '//insbizmallcdn.wisacdn.com/_data/icon/b1152c229d1bc06c24c1f92c62f166d2.jpg',
-    build   : '//insbizmallcdn.wisacdn.com/_data/icon/caace9e64bc35a1bebbb30d094aba180.jpg',
-    location: '//insbizmallcdn.wisacdn.com/_data/icon/ec958e1ecd3ebeb9871ef2ddb02442c0.jpg'
-  };
-
-  const {BTN_SLIDE_ALL, ACCOUNT_ID: ID, ACCOUNT_NAME: NAME} = ELEMENT;
-  const {PRD_LINK, IMG_LOCATION} = INFO;
-  const isLogin = !(ID === null || NAME === null) && !(ID.textContent === '' || NAME === '');
-
-  const setLayer = ({trigger}) => {
-    const elements = {
-      target    : trigger,
-      el        : null,
-      btnClose  : null,
-      transition: false
+  const carouselSlide = ({el, opts}) => {
+    const error = ({msg}) => {
+      return console.error(`slide script error: ${msg}`);
     };
 
-    const elClass = trigger.getAttribute('aria-controls');
-    elements.el = docSelector({el: `.${elClass}`});
-    elements.btnClose = elements.el.querySelector('.btn-close');
-    elements.transition = !!elements.el.dataset.transition;
+    if (!el) {
+      return error({msg: 'not found el'});
+    }
 
-    const {target, el, btnClose} = elements;
+    const defaultOpts = {
+      mode      : 'horizontal',
+      wrap      : 'ul',
+      slide     : 'li',
+      view      : 1,
+      space     : 0,
+      loop      : false,
+      direction : false,
+      pagination: false,
+      timing     : null
+    };
 
-    const windowClickEvent = e => {
-      const safetyZone = el.children[0];
-      let target = e.target;
-      while (target !== undefined && target.parentNode) {
-        if (target === safetyZone) {
+    const slideEl = {
+      first     : null,
+      last      : null,
+      firstClone: null,
+      lastClone : null,
+      btnPrev   : null,
+      btnNext   : null,
+      pagination: null
+    };
+
+    const slideOpt = Object.assign({}, defaultOpts, opts);
+    const {mode, wrap, slide, view, loop, direction, pagination, timing} = slideOpt;
+    const carousel = docSelector({el: el});
+    const slideWrap = carousel.querySelector(wrap);
+    const slides = carousel.querySelectorAll(slide);
+    const slideLength = slides.length;
+    const cloneLength = 2;
+    let slideWidth = Math.trunc(slideWrap.offsetWidth / view);
+    let currentIndex = 0;
+    let isTransition = true;
+    let transformX = loop ? -(slideWidth) : 0;
+    const speed = (500 / 1000);
+    let timer = null;
+
+    const setInitialElement = _ => {
+      slideEl.first = slides[0];
+      slideEl.last = slides[slideLength - 1];
+
+      slideEl.first.classList.add('current');
+    };
+
+    const setInitialClone = ({type}) => {
+      slideEl[`${type}Clone`] = slideEl[type].cloneNode(true);
+      slideEl[`${type}Clone`].classList.remove('current');
+      slideEl[`${type}Clone`].classList.add('clone');
+      slideEl[`${type}Clone`].removeAttribute('data-index');
+
+      insertEl({
+        target  : slideWrap,
+        position: type === 'first' ? 'beforeend' : 'afterbegin',
+        el      : slideEl[`${type}Clone`]
+      });
+    };
+
+    const setInitialStyle = _ => {
+      const wrapWidth = slideWidth * slideLength + cloneLength;
+
+      carousel.setAttribute('style', 'position: relative');
+      slideWrap.setAttribute('style', `display: flex; width: ${wrapWidth}px; align-items: center; transform: translateX(${transformX}px);`);
+      [...slides].map((el, i) => {
+        el.classList.add(i % 2 === 0 ? 'odd' : 'even');
+        el.setAttribute('style', `flex-shrink: 0; width: ${slideWidth}px;`);
+        el.dataset.index = i;
+      });
+    };
+
+    const getTransition = _ => {
+      slideWrap.addEventListener('transitionend', e => {
+        const target = e.target;
+        if (target.className !== 'slides') {
           return;
         }
-        target = target.parentNode;
+
+        isTransition = true;
+      });
+
+      slideWrap.addEventListener('transitionstart', e => {
+        const target = e.target;
+        if (target.className !== 'slides') {
+          return;
+        }
+
+        isTransition = false;
+      });
+    };
+
+    const setElement = _ => {
+      const prevSlide = slideWrap.querySelector('li.current');
+      const currentSlide = slideWrap.querySelector(`li[data-index="${currentIndex}"]`);
+      const isFirst = currentIndex === 0;
+      const isLast = currentIndex === slideLength - 1;
+
+      prevSlide.classList.remove('current');
+      currentSlide.classList.add('current');
+
+      if (!loop) {
+        slideEl.btnPrev.disabled = isFirst;
+        slideEl.btnNext.disabled = isLast;
       }
-
-      close();
     };
 
-    const open = _ => {
-      elements.transition = false;
-      el.style.display = 'block';
-
-      setTimeout(_ => {
-        el.classList.add('on');
-        window.addEventListener('click', windowClickEvent);
-      }, 0);
-
-      btnClose.addEventListener('click', close);
-      el.removeEventListener('transitionend', animate);
-    };
-
-    const animate = _ => {
-      if (!elements.transition) {
+    const setIndex = ({index}) => {
+      if (!isTransition) {
         return;
       }
 
-      el.style.display = 'none';
-      el.classList.remove('animate');
-      elements.transition = false;
+      currentIndex = index;
+      transformX = -((currentIndex + (loop ? cloneLength / 2 : 0)) * slideWidth);
+
+      onAnimation();
     };
 
-    const close = _ => {
-      el.classList.remove('on');
-      el.classList.add('animate');
-      elements.transition = true;
+    const onCloneAnimation = ({type}) => {
+      const isLast = type === 'last';
 
-      el.addEventListener('transitionend', animate);
-      btnClose.removeEventListener('click', close);
-      window.removeEventListener('click', windowClickEvent);
+      slideWrap.style.transition = 'transform 0s';
+      transformX = isLast ? -(((loop ? cloneLength / 2 : 0)) * slideWidth) : -(slideLength * slideWidth);
+      slideWrap.style.transform = `translateX(${transformX}px)`;
+      currentIndex = isLast ? 0 : slideLength - 1;
     };
 
-    target.addEventListener('click', open);
-  };
+    const onAnimation = _ => {
+      slideWrap.style.transition = `transform ${speed}s`;
+      slideWrap.style.transform = `translateX(${transformX}px)`;
 
-  const topSlide = _ => {
-    const $topSlide = $('.slide-top-wrap').slick({
-      slidesToShow  : 2,
-      slidesToScroll: 2,
-      autoplay      : true,
-      autoplaySpeed : 3000,
-      direction     : true,
-      centerPadding : '10px',
-      prevArrow     : $('.btn-prev'),
-      nextArrow     : $('.btn-next')
-    });
-
-    const $pause = $topSlide.siblings('.slide-top-buttons').children('.btn-pause');
-
-    let isPause = false;
-
-    $pause.on('click', _ => {
-      $topSlide.slick(isPause ? 'slickPlay' : 'slickPause');
-      $pause
-        .attr('class', isPause ? 'btn-pause' : 'btn-play')
-        .children('span')
-        .text(isPause ? '일시정지' : '재생');
-
-      isPause = !isPause;
-    });
-  };
-
-  const tabEvent = ({type, target, el}) => {
-    const elements = {
-      tab  : null,
-      panel: null,
-      slide: null,
-      index: 0
-    };
-
-    let currentSlide;
-    let timer = null;
-
-    const wrap = docSelector({el: `.${type}.curation`});
-    const isPopular = type === 'popular';
-    const items = isPopular ? BEST_ITEMS : RECOMMEND_ITEMS;
-    const title = isPopular ? '🔥 지금 제일 잘 나가는 상품' : 'MD 추천 상품';
-
-    const setUI = _ => {
-      const UI = {tab: null, panel: null};
-      const panelWrap = createEl({tag: 'div', attribute: {className: `${type}-panels curation-panels`}});
-
-      UI.tab = items.reduce((acc, curr, i) => {
-        const markup = `<button
-            id="${type}-tab-${i + 1}"
-            role="tab"
-            class="curation-tab"
-            aria-selected="false"
-            aria-controls="${type}-panel-${i + 1}"
-            data-index="${i}"
-            tabindex="-1">
-            <span>${curr.category}</span>
-          </button>`;
-        return acc + markup;
-      }, '');
-
-      items.map((prd, i) => {
-        const panel = createEl({
-          tag      : 'div',
-          attribute: {
-            id       : `${type}-panel-${i + 1}`,
-            className: `curation-panel ${type}-panel`,
-            tabIndex : `${i === 0 ? 0 : -1}`,
-            hidden   : true
-          }
-        });
-        panel.setAttribute('role', 'tabpanel');
-
-        const UI = prd.products.reduce((acc, curr) => {
-          const discount = curr.price.origin - curr.price.sale;
-          const percent = (discount / curr.price.origin * 100);
-          const price = curr.price.origin.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-          const origin = curr.price.origin.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-          const badge = curr.badge.length > 0 ? curr.badge.reduce((acc, curr) => acc + `<img src="${ARR_BADGE[curr]}" alt="">`, ['']) : '';
-
-          const markup = `<div class="product">
-            <a href="${PRD_LINK}${curr.href}">
-              <span class="img">
-                <span class="img-wrap">
-                  <img
-                    src="${IMG_LOCATION}${curr.img}"
-                    onerror="this.src='//insterior.biz/_skin/insterior/img/etc/transparent.png'"
-                    alt="">
-                </span>
-              </span>
-              <div class="info">
-                <span class="brand">${curr.brand}</span>
-                <strong class="name">${curr.name}</strong>
-                <div class="price${!isLogin ? ' visitor' : ''}">
-                ${!isLogin
-    ? '<span class="visitor-price">사업자회원 특별할인가</span>'
-    : `<span class="price-wrap">
-          ${curr.price.origin !== 0 && curr.price.origin !== curr.price.sale
-    ? `<span class="percent">${Math.trunc(percent)}%</span>
-            <span class="origin">
-              <em>${origin}</em>
-            </span>`
-    : ''}
-                  <span class="sale">
-                    <em>${price}</em><span>원</span>
-                  </span>
-                </span>`}
-                ${curr.badge.length > 0 ? `<div class="badge">${badge}</div>` : ''}
-                </div>
-              </div>
-            </a>
-          </div>`;
-
-          return acc + markup;
-        }, '');
-
-        panel.innerHTML = '<div class="panel-wrap">' + UI + '</div>';
-        panelWrap.insertAdjacentElement('beforeend', panel);
-      });
-
-      wrap.innerHTML = `<div class="curation-wrap">
-        <h2>${title}</h2>
-        <div class="curation-tabs">
-          <div class="${type}-tabs tab-wrap">
-            ${UI.tab}
-          </div>
-        </div>
-      </div>`;
-
-      wrap.querySelector('.curation-wrap').insertAdjacentElement('beforeend', panelWrap);
-    };
-
-    const setTabEvent = _ => {
-      const tabs = docSelector({el: `${target} [role="tab"]`, all: true});
-      const panels = docSelector({el: `${el} [role="tabpanel"]`, all: true});
-      const length = panels.length;
-      const timing = 5000;
-
-      const setTab = _ => {
-        const tabAttr = {
-          'tabIndex'    : 0,
-          'ariaSelected': true
-        };
-
-        elements.tab = tabs[elements.index];
-        elements.panel = panels[elements.index];
-        elements.slide = $(el).find('.panel-wrap').eq(elements.index);
-
-        Object.assign(elements.tab, tabAttr);
-        elements.panel.removeAttribute('hidden');
-      };
-
-      const setSlide = _ => {
-        if (currentSlide) {
-          currentSlide.slick('unslick');
+      slideWrap.addEventListener('transitionend', e => {
+        const target = e.target;
+        if (target.className !== 'slides') {
+          return;
         }
 
-        currentSlide = $(elements.slide).slick({
-          slidesToShow  : 5,
-          slidesToScroll: 5,
-          infinite      : false,
-          dots          : false,
-          direction     : true
-        });
-      };
+        if (loop) {
+          if (currentIndex > slideLength - 1) {
+            onCloneAnimation({type: 'last'});
+          }
 
-      const hideElement = _ => {
-        const tabAttr = {
-          'tabIndex'    : -1,
-          'ariaSelected': false
-        };
+          if (currentIndex < 0) {
+            onCloneAnimation({type: 'first'});
+          }
+        }
 
-        const panelAttr = {
-          'tabindex': -1,
-          'hidden'  : true
-        };
-
-        Object.assign(elements.tab, tabAttr);
-        Object.assign(elements.panel, panelAttr);
-      };
-
-      const showElements = _ => {
-        const tabAttr = {
-          'tabIndex'    : 0,
-          'ariaSelected': true
-        };
-
-        Object.assign(elements.tab, tabAttr);
-        elements.panel.setAttribute('tabindex', 0);
-        elements.panel.removeAttribute('hidden');
-      };
-
-      const setElements = ({target, panelId}) => {
-        elements.tab = target;
-        elements.panel = docSelector({el: panelId});
-        elements.slide = elements.panel.querySelector('.panel-wrap');
-        elements.index = target.getAttribute('data-index');
-      };
-
-      const onChange = e => {
-        const target = e.target;
-        const panelId = `#${target.getAttribute('aria-controls')}`;
-
-        hideElement();
-        setElements({target, panelId});
-        showElements();
-        setSlide();
-      };
-
-      const startInterval = _ => {
-        elements.index = length - 2 < elements.index ? 0 : Number(elements.index) + 1;
-
-        hideElement();
-        setTab();
-        setSlide();
-      };
-
-      const stopInterval = _ => {
-        clearInterval(timer);
-      };
-
-      tabs.forEach(tab => {
-        tab.addEventListener('click', onChange);
-      });
-
-      setTab();
-      setSlide();
-
-      timer = setInterval(startInterval, timing);
-
-      wrap.addEventListener('mouseenter', stopInterval);
-      wrap.addEventListener('mouseleave', _ => {
-        timer = setInterval(startInterval, timing);
+        onPagination();
+        setElement();
       });
     };
 
-    setUI();
-    setTabEvent();
+    const onPagination = _ => {
+      const currentDot = slideEl.pagination.querySelector(`button[data-index="${currentIndex}"]`);
+      const prevDot = slideEl.pagination.querySelector('.current');
+
+      prevDot.classList.remove('current');
+      currentDot.classList.add('current');
+    };
+
+    const onMove = e => {
+      const target = e.target;
+      const isPrev = target.className.indexOf('btnPrev') > -1;
+      const resetPoint = isPrev ? 0 : slideLength - 1;
+      let index = currentIndex;
+
+      if (!loop && index === resetPoint) {
+        return;
+      }
+
+      index = isPrev ? index - 1 : index + 1;
+
+      setIndex({index});
+    };
+
+    const setDirection = _ => {
+      slideEl.btnPrev = createEl({
+        tag      : 'button',
+        attribute: {
+          className: 'carouselButton btnPrev',
+          style    : 'position: absolute; left: 0; top: 50%; transform: translateY(-50%)',
+          disabled : !loop
+        }
+      });
+
+      slideEl.btnNext = createEl({
+        tag      : 'button',
+        attribute: {
+          className: 'carouselButton btnNext',
+          style    : 'position: absolute; right: 0; top: 50%; transform: translateY(-50%)'
+        }
+      });
+
+      slideEl.btnPrev.textContent = '<';
+      slideEl.btnNext.textContent = '>';
+
+      insertEl({
+        target: slideWrap,
+        el    : slideEl.btnPrev
+      });
+
+      insertEl({
+        target  : slideWrap,
+        position: 'afterend',
+        el      : slideEl.btnNext
+      });
+
+      slideEl.btnPrev.addEventListener('click', onMove);
+      slideEl.btnNext.addEventListener('click', onMove);
+    };
+
+    const setPagination = _ => {
+      slideEl.pagination = createEl({
+        tag      : 'div',
+        attribute: {
+          className: 'pagination',
+          style    : 'text-align: center'
+        }
+      });
+
+      [...slides].map((el, i) => {
+        const dot = createEl({
+          tag      : 'button',
+          attribute: {
+            type     : 'button',
+            className: i === 0 ? 'dot current' : 'dot'
+          }
+        });
+
+        dot.dataset.index = i;
+        dot.textContent = i;
+
+        insertEl({
+          target  : slideEl.pagination,
+          position: 'beforeend',
+          el      : dot
+        });
+      });
+
+      insertEl({
+        target  : carousel,
+        position: 'beforeend',
+        el      : slideEl.pagination
+      });
+
+      slideEl.pagination.addEventListener('click', e => {
+        const target = e.target;
+
+        if (target.tagName !== 'BUTTON') {
+          return;
+        }
+
+        const index = Number(target.getAttribute('data-index'));
+        setIndex({index});
+      });
+    };
+
+    const startInterval = _ => {
+      setIndex({index: currentIndex + 1});
+    };
+
+    const stopInterval = _ => {
+      clearInterval(timer);
+    };
+
+    timer = setInterval(startInterval, timing);
+
+    carousel.addEventListener('mouseenter', stopInterval);
+    carousel.addEventListener('mouseleave', _ => {
+      timer = setInterval(startInterval, timing);
+    });
+
+
+    const setCarousel = _ => {
+      setInitialStyle();
+      setInitialElement();
+
+      if (loop) {
+        setInitialClone({type: 'first'});
+        setInitialClone({type: 'last'});
+      }
+
+      if (direction) {
+        setDirection();
+      }
+
+      if (pagination) {
+        setPagination();
+      }
+
+      getTransition();
+    };
+
+    setCarousel();
   };
 
   const init = _ => {
     window.addEventListener('touchstart', _ => {});
-    userRedirect();
-    topSlide();
-    tabEvent({type: 'popular', target: '.popular-tabs', el: '.popular-panels'});
-    tabEvent({type: 'recommend', target: '.recommend-tabs', el: '.recommend-panels'});
-    setLayer({trigger: BTN_SLIDE_ALL});
+    carouselSlide({
+      el  : '.slideWrap',
+      opts: {
+        loop      : true,
+        direction : true,
+        pagination: true,
+        timing: 3000
+      }
+    });
   };
 
   return {
-    init,
-    userRedirect
+    init
   };
 })();
-
-mainJS.userRedirect();
 
 if (document.readyState === 'complete') {
   mainJS.init();

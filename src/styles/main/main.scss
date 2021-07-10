@@ -1,0 +1,211 @@
+@import "./partials/mixin";
+
+body {
+    font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, Noto Sans KR, system-ui, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif;
+    font-weight: $normal;
+
+    button {
+        cursor: pointer;
+
+        &:active {
+            opacity: .8;
+        }
+    }
+}
+
+.visual {
+    position: relative;
+    width: 700px;
+    margin: 50px auto;
+    background-color: #000;
+
+    &:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #000 url("/images/main/background.jpg") no-repeat 50% 50%;
+        background-size: cover;
+        opacity: .4;
+    }
+}
+
+.slideWrap {
+    overflow: hidden;
+    width: 700px;
+    margin: 0 auto;
+    height: 400px;
+
+    ul {
+        position: relative;
+    }
+
+    li {
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        justify-content: center;
+        height: 400px;
+        padding: 0 70px;
+        box-sizing: border-box;
+        overflow: hidden;
+
+        &.even {
+            .imgWrap {
+                right: 70px;
+            }
+
+            .title,
+            .description {
+                transform: translateX(-100px);
+            }
+
+            .description:before {
+                left: 0;
+            }
+        }
+
+        &.odd {
+            .imgWrap {
+                left: 70px;
+            }
+
+            .title,
+            .description {
+                padding-left: 200px;
+                text-align: right;
+                transform: translateX(100px);
+
+            }
+
+            .description:before {
+                right: 0;
+            }
+        }
+
+        &.current {
+            .title,
+            .description {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .imgWrap {
+            overflow: hidden;
+            position: absolute;
+            top: 50%;
+            width: 200px;
+            height: 200px;
+            transform: translateY(-50%);
+            border-radius: 100%;
+            background-color: #fff;
+        }
+
+        img {
+            @include img;
+        }
+    }
+
+    .title,
+    .description {
+        display: block;
+        position: relative;
+        z-index: 1;
+        color: #fff;
+        text-shadow: 0 0 8px rgba(0, 0, 0, 1);
+        opacity: 0;
+        will-change: auto;
+        transition: opacity 1s, transform 1s;
+    }
+
+    .title {
+        font-weight: $bold;
+        font-size: 40px;
+    }
+
+    .description {
+        position: relative;
+        margin-top: 30px;
+        font-size: 14px;
+
+        &:before {
+            content: "";
+            position: absolute;
+            top: -18px;
+            width: 100px;
+            height: 2px;
+            background-color: rgb(56, 219, 255);
+        }
+    }
+
+    .carouselButton {
+        appearance: none;
+        width: 50px;
+        height: 50px;
+        border: none;
+        z-index: 10;
+        text-indent: -9999px;
+        padding: 0;
+        opacity: .8;
+        transition: opacity .3s;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        &.btnPrev {
+            background: rgba(255, 255, 255, .5) url(iconArrowPrev("000000")) no-repeat 50% 50%;
+            background-size: 50px 50px;
+        }
+
+        &.btnNext {
+            background: rgba(255, 255, 255, .5) url(iconArrowNext("000000")) no-repeat 50% 50%;
+            background-size: 50px 50px;
+        }
+
+        &[disabled] {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+
+    .pagination {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 10px;
+
+        .dot {
+            appearance: none;
+            padding: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            text-indent: -9999px;
+            background-color: rgb(255, 255, 255);
+            box-shadow: 0 0 2px 0 rgba(0, 0, 0, .3);
+            border: none;
+            margin-left: 5px;
+            vertical-align: top;
+            opacity: .6;
+            transition: opacity .3s;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &.current {
+                width: 30px;
+                background-color: rgb(56, 219, 255);
+            }
+        }
+    }
+}
