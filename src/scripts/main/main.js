@@ -121,6 +121,16 @@ const mainJS = (_ => {
       });
     };
 
+
+    const setIndex = ({index}) => {
+      if (!isTransition) {
+        return;
+      }
+
+      currentIndex = index;
+      transformX = -((currentIndex + (loop ? cloneLength / 2 : 0)) * slideWidth);
+
+      onAnimation();
     };
 
     const onNextSlide = _ => {
