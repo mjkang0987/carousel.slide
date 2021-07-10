@@ -128,6 +128,20 @@ const mainJS = (_ => {
     };
 
     const onThisSlide = _ => {
+
+    const onMove = e => {
+      const target = e.target;
+      const isPrev = target.className.indexOf('btnPrev') > -1;
+      const resetPoint = isPrev ? 0 : slideLength - 1;
+      let index = currentIndex;
+
+      if (!loop && index === resetPoint) {
+        return;
+      }
+
+      index = isPrev ? index - 1 : index + 1;
+
+      setIndex({index});
     };
 
     const setDirection = _ => {
@@ -162,8 +176,8 @@ const mainJS = (_ => {
         el      : slideEl.btnNext
       });
 
-      slideEl.btnPrev.addEventListener('click', onPrevSlide);
-      slideEl.btnNext.addEventListener('click', onNextSlide);
+      slideEl.btnPrev.addEventListener('click', onMove);
+      slideEl.btnNext.addEventListener('click', onMove);
     };
 
     const setPagination = _ => {
