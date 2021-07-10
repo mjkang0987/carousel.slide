@@ -68,9 +68,11 @@ const mainJS = (_ => {
       slideEl.last = slides[slideLength - 1];
     };
 
-    const setInitialClone = _ => {
-      slideEl.firstClone = slideEl.first.cloneNode(true);
-      slideEl.lastClone = slideEl.last.cloneNode(true);
+    const setInitialClone = ({type}) => {
+      slideEl[`${type}Clone`] = slideEl[type].cloneNode(true);
+      slideEl[`${type}Clone`].classList.remove('current');
+      slideEl[`${type}Clone`].classList.add('clone');
+      slideEl[`${type}Clone`].removeAttribute('data-index');
 
       insertEl({
         target  : slideWrap,
@@ -198,7 +200,8 @@ const mainJS = (_ => {
       setInitialElement();
 
       if (loop) {
-        setInitialClone();
+        setInitialClone({type: 'first'});
+        setInitialClone({type: 'last'});
       }
 
       if (direction) {
