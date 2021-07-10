@@ -133,7 +133,14 @@ const mainJS = (_ => {
       onAnimation();
     };
 
-    const onNextSlide = _ => {
+    const onCloneAnimation = ({type}) => {
+      const isLast = type === 'last';
+
+      slideWrap.style.transition = 'transform 0s';
+      transformX = isLast ? -(((loop ? cloneLength / 2 : 0)) * slideWidth) : -(slideLength * slideWidth);
+      slideWrap.style.transform = `translateX(${transformX}px)`;
+      currentIndex = isLast ? 0 : slideLength - 1;
+    };
 
     const onAnimation = _ => {
       slideWrap.style.transition = `transform ${speed}s`;
