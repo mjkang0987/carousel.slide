@@ -167,11 +167,11 @@ const mainJS = (_ => {
     };
 
     const setPagination = _ => {
-      const paginationWrap = createEl({
+      slideEl.pagination = createEl({
         tag      : 'div',
         attribute: {
           className: 'pagination',
-          style: 'text-align: center'
+          style    : 'text-align: center'
         }
       });
 
@@ -180,7 +180,7 @@ const mainJS = (_ => {
           tag      : 'button',
           attribute: {
             type     : 'button',
-            className: 'dot'
+            className: i === 0 ? 'dot current' : 'dot'
           }
         });
 
@@ -188,7 +188,7 @@ const mainJS = (_ => {
         dot.textContent = i;
 
         insertEl({
-          target  : paginationWrap,
+          target  : slideEl.pagination,
           position: 'beforeend',
           el      : dot
         });
