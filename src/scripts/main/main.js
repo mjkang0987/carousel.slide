@@ -56,7 +56,7 @@ const mainJS = (_ => {
     };
 
     const slideOpt = Object.assign({}, defaultOpts, opts);
-    const {mode, wrap, slide, view, loop, direction, pagination} = slideOpt;
+    const {mode, wrap, slide, view, loop, direction, pagination, timing} = slideOpt;
     const carousel = docSelector({el: el});
     const slideWrap = carousel.querySelector(wrap);
     const slides = carousel.querySelectorAll(slide);
