@@ -328,10 +328,12 @@ const mainJS = (_ => {
   const init = _ => {
     window.addEventListener('touchstart', _ => {});
     carouselSlide({
-      el: '.slideWrap',
+      el  : '.slideWrap',
       opts: {
-        direction: true,
-        pagination: true
+        loop      : true,
+        direction : true,
+        pagination: true,
+        timing: 3000
       }
     });
   };
