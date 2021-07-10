@@ -1,0 +1,21 @@
+$normal: 400;
+$bold: 700;
+
+@mixin img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    margin: auto;
+    object-fit: cover;
+}
+
+@function iconArrowPrev($color) {
+    @return "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' fill='none'%3E%3Cpath d='M17.5 10l-5 5 5 5' stroke='%23#{$color}' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+}
+
+@function iconArrowNext($color) {
+    @return "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' fill='none'%3E%3Cpath d='M12.5 20l5-5-5-5' stroke='%23#{$color}' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+}
