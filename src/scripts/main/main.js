@@ -88,9 +88,12 @@ const mainJS = (_ => {
       const slideWidth = Math.trunc(slideWrap.offsetWidth / view);
       const wrapWidth = slideWidth * slideLength + cloneLength;
 
-      carousel.setAttribute('style', 'overflow: hidden;');
-      slideWrap.setAttribute('style', `display: flex; width: ${wrapWidth}px;`);
-      [...slides].map(el => el.setAttribute('style', `flex-shrink: 0; width: ${slideWidth}px;`));
+      carousel.setAttribute('style', 'position: relative');
+      slideWrap.setAttribute('style', `display: flex; width: ${wrapWidth}px; align-items: center`);
+      [...slides].map((el, i) => {
+        el.setAttribute('style', `flex-shrink: 0; width: ${slideWidth}px;`);
+        el.dataset.index = i;
+      });
     };
 
     const setDirection = _ => {
