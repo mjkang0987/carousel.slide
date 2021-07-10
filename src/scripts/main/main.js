@@ -52,7 +52,7 @@ const mainJS = (_ => {
       lastClone : null,
       btnPrev   : null,
       btnNext   : null,
-      direction : null
+      pagination: null
     };
 
     const slideOpt = Object.assign({}, defaultOpts, opts);
