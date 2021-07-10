@@ -78,14 +78,8 @@ const mainJS = (_ => {
 
       insertEl({
         target  : slideWrap,
-        position: 'afterbegin',
-        el      : slideEl.lastClone
-      });
-
-      insertEl({
-        target  : slideWrap,
-        position: 'beforeend',
-        el      : slideEl.firstClone
+        position: type === 'first' ? 'beforeend' : 'afterbegin',
+        el      : slideEl[`${type}Clone`]
       });
     };
 
