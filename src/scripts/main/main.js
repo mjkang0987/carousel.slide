@@ -93,8 +93,9 @@ const mainJS = (_ => {
       const wrapWidth = slideWidth * slideLength + cloneLength;
 
       carousel.setAttribute('style', 'position: relative');
-      slideWrap.setAttribute('style', `display: flex; width: ${wrapWidth}px; align-items: center`);
+      slideWrap.setAttribute('style', `display: flex; width: ${wrapWidth}px; align-items: center; transform: translateX(${transformX}px);`);
       [...slides].map((el, i) => {
+        el.classList.add(i % 2 === 0 ? 'odd' : 'even');
         el.setAttribute('style', `flex-shrink: 0; width: ${slideWidth}px;`);
         el.dataset.index = i;
       });
