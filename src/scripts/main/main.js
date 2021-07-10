@@ -135,7 +135,8 @@ const mainJS = (_ => {
         tag      : 'button',
         attribute: {
           className: 'carouselButton btnPrev',
-          style    : 'position: absolute; left: 0; top: 50%; transform: translateY(-50%)'
+          style    : 'position: absolute; left: 0; top: 50%; transform: translateY(-50%)',
+          disabled : !loop
         }
       });
 
