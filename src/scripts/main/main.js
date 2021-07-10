@@ -96,6 +96,16 @@ const mainJS = (_ => {
       });
     };
 
+    const onPrevSlide = _ => {
+    };
+
+    const onNextSlide = _ => {
+
+    };
+
+    const onThisSlide = _ => {
+    };
+
     const setDirection = _ => {
       slideEl.btnPrev = createEl({
         tag      : 'button',
@@ -132,13 +142,40 @@ const mainJS = (_ => {
     };
 
     const setPagination = _ => {
-    };
+      const paginationWrap = createEl({
+        tag      : 'div',
+        attribute: {
+          className: 'pagination',
+          style: 'text-align: center'
+        }
+      });
 
-    const onPrevSlide = _ => {
-    };
+      [...slides].map((el, i) => {
+        const dot = createEl({
+          tag      : 'button',
+          attribute: {
+            type     : 'button',
+            className: 'dot'
+          }
+        });
 
-    const onNextSlide = _ => {
+        dot.dataset.index = i;
+        dot.textContent = i;
 
+        insertEl({
+          target  : paginationWrap,
+          position: 'beforeend',
+          el      : dot
+        });
+      });
+
+      insertEl({
+        target  : carousel,
+        position: 'beforeend',
+        el      : paginationWrap
+      });
+
+      paginationWrap.addEventListener('click', onThisSlide);
     };
 
     const setCarousel = _ => {
