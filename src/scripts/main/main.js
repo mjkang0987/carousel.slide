@@ -135,6 +135,29 @@ const mainJS = (_ => {
 
     const onNextSlide = _ => {
 
+    const onAnimation = _ => {
+      slideWrap.style.transition = `transform ${speed}s`;
+      slideWrap.style.transform = `translateX(${transformX}px)`;
+
+      slideWrap.addEventListener('transitionend', e => {
+        const target = e.target;
+        if (target.className !== 'slides') {
+          return;
+        }
+
+        if (loop) {
+          if (currentIndex > slideLength - 1) {
+            onCloneAnimation({type: 'last'});
+          }
+
+          if (currentIndex < 0) {
+            onCloneAnimation({type: 'first'});
+          }
+        }
+
+        onPagination();
+        setElement();
+      });
     };
 
     const onPagination = _ => {
