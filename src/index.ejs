@@ -1,0 +1,117 @@
+---
+groups:
+  example: 예제
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title><%= pkgInfo.name %></title>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="/images/favicon/favicon.ico">
+  <link
+    rel="stylesheet"
+    href="/styles/common/common.css">
+  <link
+    rel="stylesheet"
+    href="/styles/index/index.css">
+</head>
+<body>
+<main class="main">
+  <aside
+    class="aside">
+    <div
+      class="repo"
+      aria-expanded="true">
+      <button
+        type="button"
+        class="btn-toggle">
+        <span>저장소 정보 닫기</span>
+      </button>
+      <div class="repo-avatar">
+        <img
+          src="/images/index/avatar.svg"
+          alt="<%= pkgInfo.name %>">
+      </div>
+      <h1 class="repo-title">
+        <a
+          href="<%- pkgInfo.repository.url %>"
+          target="_blank">
+          <%= pkgInfo.name %>
+        </a>
+      </h1>
+      <p class="repo-desc"><%= pkgInfo.description %></p>
+      <div class="repo-search">
+        <label>
+          <input
+            class="input-search"
+            type="search"
+            placeholder="SEARCH"
+            required>
+        </label>
+      </div>
+    </div>
+    <div class="page-wrap">
+      <div class="page-scroll">
+        <%
+        const groups = Object.keys(list);
+        groups.map(g => { %>
+          <div
+            class="page-group-wrap"
+            data-depth="0">
+            <strong class="page-group-name"><%= list[g].name %></strong>
+            <ul class="page-groups">
+              <%
+                if (list[g].pages.length > 0) {
+                  list[g].pages.map(page => {
+              %>
+                <li
+                  class="<%= page.path.replace(/\//g, '-').slice(1); %>"
+                  data-depth="1">
+                  <strong class="page-name">
+                    <%= page.name %>
+                  </strong>
+                  <ul>
+                  <% page.states.map(state => { %>
+                    <li
+                      data-depth="2"
+                      class="<%= state.unexposed ? 'disabled' : '' %>">
+                      <button
+                        type="button"
+                        data-token="<%- state.token %>"
+                        class="page-state">
+                        <%= state.text %>
+                      </button>
+                    </li>
+                  <% }); %>
+                  </ul>
+                </li>
+              <%
+                  });
+                } else {
+              %>
+                <li class="page-none">페이지가 없습니다.</li>
+              <% } %>
+            </ul>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </aside>
+  <div class="move-point"></div>
+  <div class="preview">
+    <strong class="helloWorld">Hi there! 👋<br><%= pkgInfo.name %> 프리뷰 입니다 😊</strong>
+    <iframe
+      id="contentFrame"
+      class="frame hide"
+      src="">
+    </iframe>
+    <a
+      href="#"
+      class="link-new"
+      target="_blank">WINDOW OPEN</a>
+  </div>
+</main>
+<script src="/scripts/common/common.js"></script>
+<script src="/scripts/index/index.js"></script>
+</body>
+</html>
