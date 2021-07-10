@@ -40,8 +40,8 @@ const mainJS = (_ => {
       view      : 1,
       space     : 0,
       loop      : false,
-      direction : true,
-      pagination: true
+      direction : false,
+      pagination: false
     };
 
     const slideEl = {
@@ -155,7 +155,13 @@ const mainJS = (_ => {
 
   const init = _ => {
     window.addEventListener('touchstart', _ => {});
-    carouselSlide({el: '.slideWrap'});
+    carouselSlide({
+      el: '.slideWrap',
+      opts: {
+        direction: true,
+        pagination: true
+      }
+    });
   };
 
   return {
